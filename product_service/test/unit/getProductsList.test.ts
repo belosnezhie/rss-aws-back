@@ -1,9 +1,9 @@
 import { test } from '@jest/globals';
 import { handler } from '../../lambda_functions/getProductsList';
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-import products from '../../lambda_functions/products_mock';
+import products from '../../lambda_functions/productsMock';
 
-test('test', async () => {
+test('getProductsList should return products', async () => {
   const expected = {
     statusCode: 200,
     headers: {
@@ -18,6 +18,6 @@ test('test', async () => {
 
   const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
   expect(actual.statusCode).toBe(expected.statusCode);
-  // expect(actual.headers).toBe(expected.headers);
   expect(actual.body).toBe(expected.body);
 })
+

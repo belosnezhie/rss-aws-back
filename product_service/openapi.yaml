@@ -35,16 +35,6 @@ paths:
                     description:
                       type: string
                       example: "Product 1 description"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Internal server error"
   /products/{productId}:
     get:
       summary: Get product by ID
@@ -97,13 +87,3 @@ paths:
                   message:
                     type: string
                     example: "Product not found"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Internal server error"
