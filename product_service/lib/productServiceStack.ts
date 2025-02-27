@@ -3,6 +3,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -20,6 +21,19 @@ export class ProductServiceStack extends cdk.Stack {
       }
     });
 
+    getProductsListFunction.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:Scan',
+        'dynamodb:Query',
+        'dynamodb:GetItem'
+      ],
+      resources: [
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-stocks`
+      ]
+    }));
+
     const getProductsByIdFunction = new NodejsFunction(this, 'getProductsByIdFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
@@ -31,6 +45,19 @@ export class ProductServiceStack extends cdk.Stack {
         sourceMap: true,
       }
     });
+
+    getProductsByIdFunction.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:Scan',
+        'dynamodb:Query',
+        'dynamodb:GetItem'
+      ],
+      resources: [
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-stocks`
+      ]
+    }));
 
     const api = new apigateway.RestApi(this, 'ProductsApi', {
       restApiName: 'Products Service',

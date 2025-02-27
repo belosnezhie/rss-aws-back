@@ -1,7 +1,4 @@
-interface Stock {
-  product_id: string;
-  count: number;
-}
+import { Stock } from "../model/model";
 
 const stock: Stock[] = [
   {

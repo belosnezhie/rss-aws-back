@@ -1,9 +1,4 @@
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  description: string;
-}
+import { Product } from "../model/model";
 
 const products: Product[] = [
   {
