@@ -59,6 +59,30 @@ export class ProductServiceStack extends cdk.Stack {
       ]
     }));
 
+    const createProductFunction = new NodejsFunction(this, 'createProductFunction', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: path.join(__dirname, '../lambdaFunctions/createProduct.ts'),
+      functionName: 'createProduct',
+      bundling: {
+        externalModules: [],
+        minify: true,
+        sourceMap: true,
+      }
+    });
+
+    createProductFunction.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:Scan',
+        'dynamodb:Query',
+        'dynamodb:PutItem'
+      ],
+      resources: [
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
+      ]
+    }));
+
     const api = new apigateway.RestApi(this, 'ProductsApi', {
       restApiName: 'Products Service',
       defaultCorsPreflightOptions: {
@@ -69,6 +93,7 @@ export class ProductServiceStack extends cdk.Stack {
 
     const products = api.root.addResource('products');
     products.addMethod('GET', new apigateway.LambdaIntegration(getProductsListFunction));
+    products.addMethod('POST', new apigateway.LambdaIntegration(createProductFunction));
 
     const product = products.addResource('{productId}');
     product.addMethod('GET', new apigateway.LambdaIntegration(getProductsByIdFunction));
