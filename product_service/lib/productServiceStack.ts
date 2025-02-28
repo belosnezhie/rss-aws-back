@@ -74,12 +74,12 @@ export class ProductServiceStack extends cdk.Stack {
     createProductFunction.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
-        'dynamodb:Scan',
-        'dynamodb:Query',
-        'dynamodb:PutItem'
+        'dynamodb:PutItem',
+        'dynamodb:TransactWriteItems'
       ],
       resources: [
         `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-stocks`
       ]
     }));
 

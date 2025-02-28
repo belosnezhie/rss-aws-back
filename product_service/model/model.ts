@@ -17,3 +17,10 @@ export interface AvailibleProduct {
   description: string;
   count: number;
 }
+
+export interface ProductRequest {
+  title: string;
+  description: string;
+  price: number;
+  count: number;
+}

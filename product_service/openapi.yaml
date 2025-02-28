@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://gjgxhab7s6.execute-api.eu-central-1.amazonaws.com/prod/
+  - url: https://ettdobdt61.execute-api.eu-central-1.amazonaws.com/prod/
     description: API Gateway
 
 paths:
@@ -35,6 +35,16 @@ paths:
                     description:
                       type: string
                       example: "Product 1 description"
+        "500":
+          description: Error fetching products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error."
     post:
       summary: Add new product
       description: Adds new product.
@@ -67,6 +77,36 @@ paths:
                     description:
                       type: string
                       example: "Product 1 description"
+        "400":
+          description: Error fetching products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid product data."
+        "409":
+          description: Error fetching products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Transaction failed. Product might already exist."
+        "500":
+          description: Error fetching products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error."
   /products/{productId}:
     get:
       summary: Get product by ID
@@ -119,13 +159,20 @@ paths:
                   message:
                     type: string
                     example: "Product not found"
+        "500":
+          description: Error fetching products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error."
 components:
   schemas:
     Product:
       properties:
-        id:
-          type: string
-          example: "1"
         title:
           type: string
           example: "Product 1"
@@ -135,3 +182,6 @@ components:
         description:
           type: string
           example: "Product 1 description"
+        count:
+          type: number
+          example: "1"

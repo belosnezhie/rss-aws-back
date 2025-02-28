@@ -12,7 +12,9 @@ const dynamo = DynamoDBDocumentClient.from(client);
 const productsTableName = "rss-aws-shop-products";
 const stockTableName = "rss-aws-shop-stocks";
 
-export const handler: APIGatewayProxyHandler = async (): Promise<APIGatewayProxyResult> => {
+export const handler: APIGatewayProxyHandler = async (event): Promise<APIGatewayProxyResult> => {
+  console.log('Incoming request:', event);
+
   try {
     const productsResponse = await dynamo.send(
       new ScanCommand({

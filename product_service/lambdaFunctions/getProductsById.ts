@@ -13,6 +13,8 @@ const productsTableName = "rss-aws-shop-products";
 const stockTableName = "rss-aws-shop-stocks";
 
 export const handler: APIGatewayProxyHandler = async (event): Promise<APIGatewayProxyResult> => {
+  console.log('Incoming request:', event);
+
   try {
     const productId = event.pathParameters?.productId;
 
