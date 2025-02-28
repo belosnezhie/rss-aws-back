@@ -1,7 +1,7 @@
 import { test } from '@jest/globals';
-import { handler } from '../../lambda_functions/getProductsById';
+import { handler } from '../../lambdaFunctions/getProductsById';
 import { Context, APIGatewayProxyResult, APIGatewayEventRequestContextWithAuthorizer, APIGatewayEventDefaultAuthorizerContext } from 'aws-lambda';
-import products from '../../lambda_functions/productsMock';
+import products from '../../utils/productsMock';
 
 const customEvent = {
       body: null,
