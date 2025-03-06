@@ -1,7 +1,7 @@
 import { test } from '@jest/globals';
-import { handler } from '../../lambda_functions/getProductsList';
+import { handler } from '../../lambdaFunctions/getProductsList';
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-import products from '../../lambda_functions/productsMock';
+import products from '../../utils/productsMock';
 
 test('getProductsList should return products', async () => {
   const expected = {
