@@ -89,7 +89,7 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST',
       },
-      body: JSON.stringify(`Product was created: ${createdProduct}`),
+      body: JSON.stringify(`Product was created: ${JSON.stringify(createdProduct)}`),
     };
 
   } catch (error) {
