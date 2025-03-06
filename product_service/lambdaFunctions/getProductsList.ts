@@ -1,4 +1,4 @@
-import { APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyResult, APIGatewayProxyHandler, APIGatewayProxyEvent, Context, Callback } from 'aws-lambda';
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
@@ -12,7 +12,7 @@ const dynamo = DynamoDBDocumentClient.from(client);
 const productsTableName = "rss-aws-shop-products";
 const stockTableName = "rss-aws-shop-stocks";
 
-export const handler: APIGatewayProxyHandler = async (event): Promise<APIGatewayProxyResult> => {
+export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>): Promise<APIGatewayProxyResult> => {
   console.log('Incoming request:', event);
 
   try {
