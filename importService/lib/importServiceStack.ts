@@ -21,7 +21,6 @@ export class ImportServiceStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, '../lambdaFunctions/importProductsFile.ts'),
-      functionName: 'ImportProductsFile',
       environment: {
         BUCKET_NAME: bucket.bucketName,
       },
@@ -35,8 +34,7 @@ export class ImportServiceStack extends cdk.Stack {
     const importFileParserFunction = new NodejsFunction(this, 'ImportFileParserFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
-      entry: path.join(__dirname, '../lambdaFunctions/ImportFileParser.ts'),
-      code: lambda.Code.fromAsset('lambda'),
+      entry: path.join(__dirname, '../lambdaFunctions/importFileParser.ts'),
       environment: {
         BUCKET_NAME: bucket.bucketName,
       },
@@ -50,7 +48,10 @@ export class ImportServiceStack extends cdk.Stack {
     bucket.grantPut(ImportProductsFileFunction);
     bucket.grantReadWrite(ImportProductsFileFunction);
     bucket.grantReadWrite(importFileParserFunction);
-
+    bucket.grantDelete(importFileParserFunction);
+    bucket.grantRead(importFileParserFunction);
+    bucket.grantWrite(importFileParserFunction);
+    bucket.grantPut(importFileParserFunction);
 
     bucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
