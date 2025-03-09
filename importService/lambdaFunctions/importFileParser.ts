@@ -5,6 +5,46 @@ import { Readable } from 'stream';
 
 const s3Client = new S3Client({ region: 'eu-central-1' });
 
+export const handler = async (event: S3Event): Promise<boolean> => {
+  await innerHandler(
+    event,
+    getFileContentInner,
+    moveFileInner
+  );
+  return true;
+};
+
+export async function innerHandler(
+  event: S3Event,
+  getFileContent: (bucket: string, filePath: string) => Promise<string>,
+  moveFile: (bucket: string, filePath: string, destinationPath: string) => Promise<boolean>
+): Promise<void> {
+  for (const record of event.Records) {
+    const bucket = record.s3.bucket.name;
+    const filePath = record.s3.object.key;
+    let fileContent = "";
+    try {
+      fileContent = await getFileContent(bucket, filePath);
+    } catch {
+      console.log("No body received from S3")
+      throw new Error('No body received from S3');
+    }
+
+    try {
+      await parseCsvStream(fileContent);
+    } catch {
+      throw new Error('Error during CSV parse');
+    }
+
+    const destinationPath = filePath.replace('uploaded', 'parsed');
+    try {
+      await moveFile(bucket, filePath, destinationPath);
+    } catch {
+      throw new Error('Error during copy file');
+    }
+  }
+}
+
 async function parseCsvStream(fileContent: string): Promise<any[]> {
   const results: any[] = [];
 
@@ -22,54 +62,94 @@ async function parseCsvStream(fileContent: string): Promise<any[]> {
   });
 }
 
-export const handler = async (event: S3Event): Promise<void> => {
-  try {
-    for (const record of event.Records) {
-      const bucket = record.s3.bucket.name;
-      const objectKey = record.s3.object.key;
+async function getFileContentInner(bucket: string, filePath: string): Promise<string> {
+  const { Body } = await s3Client.send(
+    new GetObjectCommand({
+      Bucket: bucket,
+      Key: filePath,
+    })
+  );
 
-      console.log(`Processing file: ${objectKey} from bucket: ${bucket}`);
-
-      const { Body } = await s3Client.send(
-        new GetObjectCommand({
-          Bucket: bucket,
-          Key: objectKey,
-        })
-      );
-
-      if (!Body) {
-        throw new Error('No body received from S3');
-      }
-
-      const fileContent = await Body.transformToString();
-      console.log('File content:', fileContent);
-
-      await parseCsvStream(fileContent);
-
-      const fileName = objectKey.split('/').pop();
-      const destinationKey = `parsed/${fileName}`;
-
-      await s3Client.send(
-        new CopyObjectCommand({
-          Bucket: bucket,
-          CopySource: `${bucket}/${objectKey}`,
-          Key: destinationKey,
-        })
-      );
-
-      console.log(`Copied file to: ${destinationKey}`);
-
-      await s3Client.send(
-        new DeleteObjectCommand({
-          Bucket: bucket,
-          Key: objectKey,
-        })
-      );
-
-      console.log(`Deleted file from: ${objectKey}`);
-    }
-  } catch (error) {
-    console.error('Error processing S3 event:', error);
-    throw error;
+  if (!Body) {
+    throw new Error('No body received from S3');
   }
-};
+
+  const fileContent = await Body.transformToString();
+  console.log('File content:', fileContent);
+  return fileContent;
+}
+
+async function moveFileInner(bucket: string, filePath: string, destinationPath: string): Promise<boolean> {
+  await s3Client.send(
+    new CopyObjectCommand({
+      Bucket: bucket,
+      CopySource: bucket + "/" + filePath,
+      Key: destinationPath,
+    })
+  );
+
+  console.log(`Copied file to: ${destinationPath}`);
+
+  await s3Client.send(
+    new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: filePath,
+    })
+  );
+
+  console.log(`Deleted file from: ${filePath}`);
+  return true;
+}
+
+
+// export const handlerInner = async (event: S3Event): Promise<void> => {
+//   try {
+//     for (const record of event.Records) {
+//       const bucket = record.s3.bucket.name;
+//       const objectKey = record.s3.object.key;
+
+//       console.log(`Processing file: ${objectKey} from bucket: ${bucket}`);
+
+//       const { Body } = await s3Client.send(
+//         new GetObjectCommand({
+//           Bucket: bucket,
+//           Key: objectKey,
+//         })
+//       );
+
+//       if (!Body) {
+//         throw new Error('No body received from S3');
+//       }
+
+//       const fileContent = await Body.transformToString();
+//       console.log('File content:', fileContent);
+
+//       await parseCsvStream(fileContent);
+
+      // const fileName = objectKey.split('/').pop();
+      // const destinationKey  = `parsed/${fileName}`;
+
+//       await s3Client.send(
+//         new CopyObjectCommand({
+//           Bucket: bucket,
+//           CopySource: `${bucket}/${objectKey}`,
+//           Key: destinationKey,
+//         })
+//       );
+
+//       console.log(`Copied file to: ${destinationKey}`);
+
+//       await s3Client.send(
+//         new DeleteObjectCommand({
+//           Bucket: bucket,
+//           Key: objectKey,
+//         })
+//       );
+
+//       console.log(`Deleted file from: ${objectKey}`);
+//     }
+//   } catch (error) {
+//     console.error('Error processing S3 event:', error);
+//     throw error;
+//   }
+// };
