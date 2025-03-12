@@ -9,8 +9,8 @@ import { AvailibleProduct } from '../model/model';
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-const productsTableName = "rss-aws-shop-products";
-const stockTableName = "rss-aws-shop-stocks";
+const productsTableName = process.env.PRODUCTS_TABLE;
+const stockTableName = process.env.STOCKS_TABLE;
 
 export const handler: APIGatewayProxyHandler = async (event): Promise<APIGatewayProxyResult> => {
   console.log('Incoming request:', event);

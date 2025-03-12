@@ -94,7 +94,7 @@ export class ProductServiceStack extends cdk.Stack {
     const catalogBatchProcess = new NodejsFunction(this, 'CatalogBatchProcessFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
-      entry: path.join(__dirname, '../src/functions/catalogBatchProcess.ts'),
+      entry: path.join(__dirname, '../lambdaFunctions/catalogBatchProcess.ts'),
       functionName: 'catalogBatchProcess',
       bundling: {
         externalModules: [],

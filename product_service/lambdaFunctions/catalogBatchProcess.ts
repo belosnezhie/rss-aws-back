@@ -12,8 +12,8 @@ import { isValidProductRequestData } from '../utils/isValidProductRequestData';
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-const PRODUCTS_TABLE = 'rss-aws-shop-products';
-const STOCKS_TABLE = 'rss-aws-shop-stocks';
+const PRODUCTS_TABLE = process.env.PRODUCTS_TABLE;
+const STOCKS_TABLE = process.env.STOCKS_TABLE;
 
 export const handler = async (event: SQSEvent): Promise<void> => {
   try {
@@ -30,7 +30,16 @@ export const handler = async (event: SQSEvent): Promise<void> => {
 
 async function processProduct(record: SQSRecord): Promise<void> {
   try {
-    const productData: ProductRequest = JSON.parse(record.body);
+    console.log('Processing product:', record.body)
+    const productData: ProductRequest = JSON.parse(record.body, (key, value) => {
+      if (key === 'price' || key === 'count') {
+        return Number(value);
+      } else {
+        return value;
+      }
+    });
+
+    console.log('Product data:', productData);
 
     if (!isValidProductRequestData(productData)) {
       console.log('Invalid product data. Required fields: title, description, price, count')
