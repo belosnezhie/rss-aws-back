@@ -1,13 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    const catalogItemsQueue = new sqs.Queue(this, 'CatalogItemsQueue', {
+      queueName: 'catalogItemsQueue',
+      visibilityTimeout: cdk.Duration.seconds(30),
+    });
 
     const getProductsListFunction = new NodejsFunction(this, 'getProductsListFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
@@ -76,6 +83,37 @@ export class ProductServiceStack extends cdk.Stack {
       actions: [
         'dynamodb:PutItem',
         'dynamodb:TransactWriteItems'
+      ],
+      resources: [
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-stocks`
+      ]
+    }));
+
+
+    const catalogBatchProcess = new NodejsFunction(this, 'CatalogBatchProcessFunction', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: path.join(__dirname, '../src/functions/catalogBatchProcess.ts'),
+      functionName: 'catalogBatchProcess',
+      bundling: {
+        externalModules: [],
+        minify: true,
+        sourceMap: true,
+      }
+    });
+
+    catalogBatchProcess.addEventSource(new lambdaEventSources.SqsEventSource(catalogItemsQueue, {
+      batchSize: 5,
+      reportBatchItemFailures: true,
+    }));
+
+    catalogBatchProcess.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:PutItem',
+        'dynamodb:TransactWriteItems',
+        'dynamodb:BatchWriteItem'
       ],
       resources: [
         `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
