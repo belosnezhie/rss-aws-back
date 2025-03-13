@@ -6,6 +6,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class ImportServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -44,6 +45,18 @@ export class ImportServiceStack extends cdk.Stack {
         sourceMap: true,
       },
     });
+
+    importFileParserFunction.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'sqs:SendMessage',
+        'sqs:SendMessageBatch'
+      ],
+      resources: [
+        `arn:aws:sqs:${this.region}:${this.account}:catalogItemsQueue`
+      ]
+    }));
+
 
     bucket.grantPut(ImportProductsFileFunction);
     bucket.grantReadWrite(ImportProductsFileFunction);
