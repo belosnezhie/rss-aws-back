@@ -6,7 +6,7 @@ import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
 const s3Client = new S3Client({ region: 'eu-central-1' });
 const queueClient = new SQSClient({});
-const sqsUrl = process.env.SQS_URL;
+const sqsUrl = 'https://sqs.eu-central-1.amazonaws.com/160885264704/catalogItemsQueue';
 
 export const handler = async (event: S3Event): Promise<boolean> => {
   await innerHandler(
@@ -58,7 +58,9 @@ async function parseCsvStream(fileContent: string): Promise<any[]> {
       .pipe(csvParser())
       .on('data', async (data) => {
         console.log("Parsed row:", data);
+        console.log('calling sendMessage')
         await sendMessage(data);
+        console.log('called sendMessage')
         results.push(data);
       })
       .on('error', (error) => reject(error))
@@ -114,7 +116,12 @@ export async function sendMessage(message: string): Promise<boolean> {
 
   console.log("Add to SQS:", JSON.stringify(message));
 
-  const response = await queueClient.send(command);
-  console.log(`Response from Queue:` + JSON.stringify(response));
-  return true;
+  try {
+    const response = await queueClient.send(command);
+    console.log(`Response from Queue:` + JSON.stringify(response));
+    return true;
+  } catch (error) {
+    console.error("Error sending message to SQS:", error);
+    throw error;
+  }
 }

@@ -6,6 +6,7 @@ import * as path from 'path';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as sns from 'aws-cdk-lib/aws-sns';
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -14,6 +15,27 @@ export class ProductServiceStack extends cdk.Stack {
     const catalogItemsQueue = new sqs.Queue(this, 'CatalogItemsQueue', {
       queueName: 'catalogItemsQueue',
       visibilityTimeout: cdk.Duration.seconds(30),
+    });
+
+    const createProductTopic = new sns.Topic(this, 'CreateProductTopic', {
+      displayName: 'Create Product Topic'
+    });
+
+    new sns.Subscription(this, 'CreateProductEmailSubscription', {
+      topic: createProductTopic,
+      protocol: sns.SubscriptionProtocol.EMAIL,
+      endpoint: 'annaneveda@gmail.com'
+    });
+
+    new sns.Subscription(this, 'PriceyProductsSubscription', {
+      topic: createProductTopic,
+      protocol: sns.SubscriptionProtocol.EMAIL,
+      endpoint: 'dmitry@romashov.tech',
+      filterPolicy: {
+        price: sns.SubscriptionFilter.numericFilter({
+          greaterThan: 400
+        })
+      }
     });
 
     const getProductsListFunction = new NodejsFunction(this, 'getProductsListFunction', {
@@ -113,13 +135,17 @@ export class ProductServiceStack extends cdk.Stack {
       actions: [
         'dynamodb:PutItem',
         'dynamodb:TransactWriteItems',
-        'dynamodb:BatchWriteItem'
+        'dynamodb:BatchWriteItem',
+        'sns:Publish'
       ],
       resources: [
         `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-products`,
-        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-stocks`
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/rss-aws-shop-stocks`,
+        createProductTopic.topicArn
       ]
     }));
+
+    catalogBatchProcess.addEnvironment('SNS_TOPIC_ARN', createProductTopic.topicArn);
 
     const api = new apigateway.RestApi(this, 'ProductsApi', {
       restApiName: 'Products Service',

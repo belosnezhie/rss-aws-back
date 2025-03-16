@@ -57,6 +57,8 @@ export class ImportServiceStack extends cdk.Stack {
       ]
     }));
 
+    importFileParserFunction.addEnvironment('SQS_QUEUE_URL', 'https://sqs.eu-central-1.amazonaws.com/160885264704/catalogItemsQueue');
+
 
     bucket.grantPut(ImportProductsFileFunction);
     bucket.grantReadWrite(ImportProductsFileFunction);

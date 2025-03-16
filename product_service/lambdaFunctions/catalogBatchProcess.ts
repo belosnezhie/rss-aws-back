@@ -8,12 +8,16 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { ProductRequest } from '../model/model';
 import { isValidProductRequestData } from '../utils/isValidProductRequestData';
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-const PRODUCTS_TABLE = process.env.PRODUCTS_TABLE;
-const STOCKS_TABLE = process.env.STOCKS_TABLE;
+const snsClient = new SNSClient({});
+const topicArn = process.env.SNS_TOPIC_ARN;
+
+const PRODUCTS_TABLE = "rss-aws-shop-products";
+const STOCKS_TABLE = "rss-aws-shop-stocks";
 
 export const handler = async (event: SQSEvent): Promise<void> => {
   try {
@@ -79,8 +83,35 @@ async function processProduct(record: SQSRecord): Promise<void> {
     await docClient.send(new TransactWriteCommand(command));
     console.log(`Successfully created product and stock with ID: ${productId}`);
 
+    await sendMessage(productData);
+
   } catch (error) {
     console.error('Transaction failed:', error);
     throw error;
   }
 }
+
+async function sendMessage(productData: ProductRequest) {
+  const message = {
+    products: productData,
+    price: productData.price,
+  };
+
+  try {
+    await snsClient.send(new PublishCommand({
+      TopicArn: topicArn,
+      Message: JSON.stringify(message),
+      MessageAttributes: {
+        price: {
+          DataType: 'Number',
+          StringValue: productData.price.toString()
+        },
+      }
+    }));
+    console.log('Message sent successfully');
+  } catch (error) {
+    console.error('Error sending message:', error);
+    throw error;
+  }
+}
+
