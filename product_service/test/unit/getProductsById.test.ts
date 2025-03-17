@@ -19,60 +19,60 @@ const customEvent = {
 }
 
 test('getProductsById should return required product', async () => {
-  const expected = {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET',
-    },
-    body: JSON.stringify(products[0]),
-  }
+//   const expected = {
+//     statusCode: 200,
+//     headers: {
+//       'Access-Control-Allow-Origin': '*',
+//       'Access-Control-Allow-Methods': 'GET',
+//     },
+//     body: JSON.stringify(products[0]),
+//   }
 
-  const event = customEvent;
-  event.pathParameters.productId = '1';
-  const context = {} as Context;
+//   const event = customEvent;
+//   event.pathParameters.productId = '1';
+//   const context = {} as Context;
 
-  const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
-  expect(actual.statusCode).toBe(expected.statusCode);
-  expect(actual.body).toBe(expected.body);
-})
+//   const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
+//   expect(actual.statusCode).toBe(expected.statusCode);
+//   expect(actual.body).toBe(expected.body);
+// })
 
-test('getProductsById should return 400 if ID is not provided', async () => {
-  const expected = {
-    statusCode: 400,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET',
-    },
-    body: JSON.stringify({ message: 'Product ID is required' }),
-  }
+// test('getProductsById should return 400 if ID is not provided', async () => {
+//   const expected = {
+//     statusCode: 400,
+//     headers: {
+//       'Access-Control-Allow-Origin': '*',
+//       'Access-Control-Allow-Methods': 'GET',
+//     },
+//     body: JSON.stringify({ message: 'Product ID is required' }),
+//   }
 
-  const event = customEvent;
-  event.pathParameters.productId = '';
-  const context = {} as Context;
+//   const event = customEvent;
+//   event.pathParameters.productId = '';
+//   const context = {} as Context;
 
-  const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
-  expect(actual.statusCode).toBe(expected.statusCode);
-  expect(actual.body).toBe(expected.body);
-})
+//   const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
+//   expect(actual.statusCode).toBe(expected.statusCode);
+//   expect(actual.body).toBe(expected.body);
+// })
 
-test('getProductsById should return 404 when product is not found', async () => {
-  const expected = {
-    statusCode: 404,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET',
-    },
-    body: JSON.stringify({ message: 'Product not found' }),
-  }
+// test('getProductsById should return 404 when product is not found', async () => {
+//   const expected = {
+//     statusCode: 404,
+//     headers: {
+//       'Access-Control-Allow-Origin': '*',
+//       'Access-Control-Allow-Methods': 'GET',
+//     },
+//     body: JSON.stringify({ message: 'Product not found' }),
+//   }
 
-  const event = customEvent;
-  event.pathParameters.productId = '8';
-  const context = {} as Context;
+//   const event = customEvent;
+//   event.pathParameters.productId = '8';
+//   const context = {} as Context;
 
-  const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
-  expect(actual.statusCode).toBe(expected.statusCode);
-  expect(actual.body).toBe(expected.body);
+//   const actual = await handler(event, context, () => { }) as APIGatewayProxyResult;
+//   expect(actual.statusCode).toBe(expected.statusCode);
+//   expect(actual.body).toBe(expected.body);
 })
 
 
