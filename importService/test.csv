@@ -1,5 +1,8 @@
-id,title,description,price
-monstera_deliciosa,Monsteradeliciosa,Monstera,100
-asplenium_nidus,Aspleniumnidus,Monstera,200
-anthurium_scherzerianum,Monstera,300
-philodendron,Philodendron,Monstera,400
+title,description,price,count
+Monstera deliciosa,Monstera,100,1
+Aspleniumnidus,Monstera,200,2
+Monstera,Monstera,300,3
+Philodendron,Philodendron,400,4
+Monstera_huge,Monstera_huge,500,5
+test,test_1,100,1
+test2,test_2,200,2

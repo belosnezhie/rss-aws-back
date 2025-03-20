@@ -2,8 +2,11 @@ import { S3Event } from 'aws-lambda';
 import { S3Client, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import csvParser from "csv-parser";
 import { Readable } from 'stream';
+import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
 const s3Client = new S3Client({ region: 'eu-central-1' });
+const queueClient = new SQSClient({});
+const sqsUrl = 'https://sqs.eu-central-1.amazonaws.com/160885264704/catalogItemsQueue';
 
 export const handler = async (event: S3Event): Promise<boolean> => {
   await innerHandler(
@@ -46,15 +49,18 @@ export async function innerHandler(
 }
 
 async function parseCsvStream(fileContent: string): Promise<any[]> {
-  const results: any[] = [];
+  const results: string[] = [];
 
   return new Promise((resolve, reject) => {
     const stream = Readable.from(fileContent);
 
     stream
       .pipe(csvParser())
-      .on('data', (data) => {
+      .on('data', async (data) => {
         console.log("Parsed row:", data);
+        console.log('calling sendMessage')
+        await sendMessage(data);
+        console.log('called sendMessage')
         results.push(data);
       })
       .on('error', (error) => reject(error))
@@ -99,4 +105,23 @@ async function moveFileInner(bucket: string, filePath: string, destinationPath: 
 
   console.log(`Deleted file from: ${filePath}`);
   return true;
+}
+
+export async function sendMessage(message: string): Promise<boolean> {
+  const command = new SendMessageCommand({
+    QueueUrl: sqsUrl,
+    DelaySeconds: 10,
+    MessageBody: JSON.stringify(message),
+  });
+
+  console.log("Add to SQS:", JSON.stringify(message));
+
+  try {
+    const response = await queueClient.send(command);
+    console.log(`Response from Queue:` + JSON.stringify(response));
+    return true;
+  } catch (error) {
+    console.error("Error sending message to SQS:", error);
+    throw error;
+  }
 }
