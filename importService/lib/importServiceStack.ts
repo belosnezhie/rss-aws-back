@@ -7,10 +7,23 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import 'dotenv/config';
 
 export class ImportServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    const authorizerFunction = lambda.Function.fromFunctionArn(
+      this,
+      'ImportAuthorizerFunction',
+      cdk.Fn.importValue('BasicAuthorizerFunctionArn')
+    );
+
+    const authorizer = new apigateway.TokenAuthorizer(this, 'ImportAuthorizer', {
+      handler: authorizerFunction,
+      identitySource: apigateway.IdentitySource.header('Authorization'),
+      resultsCacheTtl: cdk.Duration.minutes(4)
+    });
 
     const bucket = s3.Bucket.fromBucketName(
       this,
@@ -24,6 +37,7 @@ export class ImportServiceStack extends cdk.Stack {
       entry: path.join(__dirname, '../lambdaFunctions/importProductsFile.ts'),
       environment: {
         BUCKET_NAME: bucket.bucketName,
+        SQS_URL: process.env.SQS_URL || '',
       },
       bundling: {
         externalModules: [],
@@ -76,18 +90,66 @@ export class ImportServiceStack extends cdk.Stack {
 
     const api = new apigateway.RestApi(this, 'ImportApi', {
       restApiName: 'Import Service',
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS
+    });
+
+    const importIntegration = new apigateway.LambdaIntegration(ImportProductsFileFunction, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+          },
+        }
+      ],
+      requestTemplates: {
+        'application/json': '{ "statusCode": 200 }'
       }
     });
 
-    const importIntegration = new apigateway.LambdaIntegration(ImportProductsFileFunction);
     const importResource = api.root.addResource('import');
+
+    importResource.addMethod('OPTIONS', new apigateway.MockIntegration({
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET'",
+          },
+        }
+      ],
+      requestTemplates: {
+        "application/json": "{\"statusCode\": 200}"
+      },
+    }), {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        }
+      ],
+    });
+
     importResource.addMethod('GET', importIntegration, {
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
+      authorizer: authorizer,
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        }
+      ],
       requestParameters: {
-        'method.request.querystring.name': true
-      }
+        'method.request.querystring.name': true,
+      },
     });
   }
 }
