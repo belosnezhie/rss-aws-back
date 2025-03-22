@@ -34,7 +34,7 @@ export const handler = async (event: any) => {
     const base64Credentials = authorizationHeader.split(' ')[1];
     const decodedCredentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
 
-    const [username, password] = decodedCredentials.split(':');
+    const [username, password] = decodedCredentials.split('=');
 
     console.log('Username:', username);
     console.log('Password:', password);

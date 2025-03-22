@@ -15,9 +15,11 @@ export class ImportServiceStack extends cdk.Stack {
 
     const authorizerFunction = lambda.Function.fromFunctionArn(
       this,
-      'ImportAuthorizerFunction',
+      'BasicAuthorizerFunction',
       cdk.Fn.importValue('BasicAuthorizerFunctionArn')
     );
+
+    // const authorizerFunction = cdk.Fn.importValue('BasicAuthorizerFunctionArn');
 
     const authorizer = new apigateway.TokenAuthorizer(this, 'ImportAuthorizer', {
       handler: authorizerFunction,
@@ -88,17 +90,90 @@ export class ImportServiceStack extends cdk.Stack {
       { prefix: 'uploaded/' }
     );
 
+    const apiGatewayRole = new iam.Role(this, 'ApiGatewayRole', {
+      assumedBy: new iam.ServicePrincipal('apigateway.amazonaws.com'),
+    });
+
+    // Add permissions to invoke Lambda functions
+    apiGatewayRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['lambda:InvokeFunction'],
+        resources: [
+          authorizerFunction.functionArn,
+          ImportProductsFileFunction.functionArn // Your import function
+        ],
+      })
+    );
+
     const api = new apigateway.RestApi(this, 'ImportApi', {
       restApiName: 'Import Service',
+      deployOptions: {
+        stageName: 'dev',
+      },
+      // defaultCorsPreflightOptions: {
+      //   allowOrigins: ['*'],
+      //   allowMethods: apigateway.Cors.ALL_METHODS,
+      //   allowHeaders: [
+      //     'Content-Type',
+      //     'X-Amz-Date',
+      //     'Authorization',
+      //     'X-Api-Key',
+      //     'X-Amz-Security-Token'
+      //   ],
+      //   allowCredentials: true
+      // }
+    });
+
+    api.addGatewayResponse('DEFAULT_4XX', {
+      type: apigateway.ResponseType.DEFAULT_4XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'Access-Control-Allow-Methods': "'GET,OPTIONS'",
+        'Access-Control-Allow-Credentials': "'true'"
+      },
+      templates: {
+        'application/json': '{"message": "$context.authorizer.message"}',
+      },
+    });
+
+    api.addGatewayResponse('UnauthorizedResponse', {
+      type: apigateway.ResponseType.UNAUTHORIZED,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'Access-Control-Allow-Methods': "'GET,OPTIONS'",
+        'Access-Control-Allow-Credentials': "'true'"
+      },
+      statusCode: '401',
+      templates: {
+        'application/json': '{"message": "Authorization required"}'
+      }
+    });
+
+    api.addGatewayResponse('AccessDeniedResponse', {
+      type: apigateway.ResponseType.ACCESS_DENIED,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'Access-Control-Allow-Methods': "'GET,OPTIONS'",
+        'Access-Control-Allow-Credentials': "'true'"
+      },
+      statusCode: '403',
+      templates: {
+        'application/json': '{"message": "Access denied"}'
+      }
     });
 
     const importIntegration = new apigateway.LambdaIntegration(ImportProductsFileFunction, {
       proxy: false,
+      credentialsRole: apiGatewayRole,
       integrationResponses: [
         {
           statusCode: '200',
           responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Credentials': "'true'",
           },
         }
       ],
@@ -117,6 +192,7 @@ export class ImportServiceStack extends cdk.Stack {
             'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
             'method.response.header.Access-Control-Allow-Origin': "'*'",
             'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET'",
+            'method.response.header.Access-Control-Allow-Credentials': "'true'"
           },
         }
       ],
@@ -131,6 +207,7 @@ export class ImportServiceStack extends cdk.Stack {
             'method.response.header.Access-Control-Allow-Headers': true,
             'method.response.header.Access-Control-Allow-Methods': true,
             'method.response.header.Access-Control-Allow-Origin': true,
+            'method.response.header.Access-Control-Allow-Credentials': true,
           },
         }
       ],
@@ -144,6 +221,7 @@ export class ImportServiceStack extends cdk.Stack {
           statusCode: '200',
           responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': true,
+            'method.response.header.Access-Control-Allow-Credentials': true,
           },
         }
       ],
