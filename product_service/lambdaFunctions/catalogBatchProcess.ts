@@ -19,26 +19,20 @@ const topicArn = process.env.SNS_TOPIC_ARN;
 const PRODUCTS_TABLE = "rss-aws-shop-products";
 const STOCKS_TABLE = "rss-aws-shop-stocks";
 
-
-export const hander = async (event: SQSEvent): Promise<boolean> => {
-  return await handlerInner(event, processProduct);
-}
-
-export const handlerInner = async (event: SQSEvent, processProductInner: (record: SQSRecord) => Promise<boolean>): Promise<boolean> => {
+export const handler = async (event: SQSEvent): Promise<void> => {
   try {
     for (const record of event.Records) {
-      await processProductInner(record);
+      await processProduct(record);
     }
 
     console.log(`Successfully processed ${event.Records.length} messages`);
-    return true;
   } catch (error) {
     console.error('Error processing batch:', error);
     throw error;
   }
 };
 
-async function processProduct(record: SQSRecord): Promise<boolean> {
+async function processProduct(record: SQSRecord): Promise<void> {
   try {
     console.log('Processing product:', record.body)
     const productData: ProductRequest = JSON.parse(record.body, (key, value) => {
@@ -89,22 +83,22 @@ async function processProduct(record: SQSRecord): Promise<boolean> {
     await docClient.send(new TransactWriteCommand(command));
     console.log(`Successfully created product and stock with ID: ${productId}`);
 
-    await sendMessage(productData, snsClient);
-    return true
+    await sendMessage(productData);
+
   } catch (error) {
     console.error('Transaction failed:', error);
     throw error;
   }
 }
 
-export async function sendMessage(productData: ProductRequest, client: SNSClient) {
+async function sendMessage(productData: ProductRequest) {
   const message = {
     products: productData,
     price: productData.price,
   };
 
   try {
-    await client.send(new PublishCommand({
+    await snsClient.send(new PublishCommand({
       TopicArn: topicArn,
       Message: JSON.stringify(message),
       MessageAttributes: {
@@ -120,4 +114,3 @@ export async function sendMessage(productData: ProductRequest, client: SNSClient
     throw error;
   }
 }
-

@@ -77,6 +77,19 @@ export class ImportServiceStack extends cdk.Stack {
       { prefix: 'uploaded/' }
     );
 
+    // Authorizer import
+    const authorizerFunction = lambda.Function.fromFunctionArn(
+      this,
+      'BasicAuthorizerFunction',
+      cdk.Fn.importValue('BasicAuthorizerFunctionArn')
+    );
+
+    const authorizer = new apigateway.TokenAuthorizer(this, 'ImportAuthorizer', {
+      handler: authorizerFunction,
+      identitySource: apigateway.IdentitySource.header('Authorization'),
+      resultsCacheTtl: cdk.Duration.seconds(0)
+    });
+
     const api = new apigateway.RestApi(this, 'ImportApi', {
       restApiName: 'Import Service',
       defaultCorsPreflightOptions: {
@@ -100,7 +113,10 @@ export class ImportServiceStack extends cdk.Stack {
     });
 
     const resource = api.root.addResource('import');
+
     resource.addMethod('GET', integration, {
+      authorizer: authorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
       requestParameters: {
         'method.request.querystring.name': true
       },

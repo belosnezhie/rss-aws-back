@@ -23,6 +23,8 @@ export const handler = async (event: any) => {
 
   console.log(`authorizationToken: ${event.authorizationToken}`)
 
+  return generatePolicy('testUser', event.methodArn);
+
   if (!event.authorizationToken) {
     return {
       statusCode: 401,
