@@ -18,6 +18,7 @@ export class ImportServiceStack extends cdk.Stack {
       'import-bucket-mycdkappstack'
     );
 
+    // Import
     const ImportProductsFileFunction = new NodejsFunction(this, 'ImportProductsFileFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
@@ -32,6 +33,7 @@ export class ImportServiceStack extends cdk.Stack {
       },
     });
 
+    // Parser
     const importFileParserFunction = new NodejsFunction(this, 'ImportFileParserFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
@@ -46,6 +48,7 @@ export class ImportServiceStack extends cdk.Stack {
       },
     });
 
+    // Permissions
     importFileParserFunction.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -78,16 +81,37 @@ export class ImportServiceStack extends cdk.Stack {
       restApiName: 'Import Service',
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowCredentials: true,
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent']
       }
     });
 
-    const importIntegration = new apigateway.LambdaIntegration(ImportProductsFileFunction);
-    const importResource = api.root.addResource('import');
-    importResource.addMethod('GET', importIntegration, {
+    const integration = new apigateway.LambdaIntegration(ImportProductsFileFunction, {
+      proxy: true,
+      integrationResponses: [{
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': "'*'",
+          'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+          'method.response.header.Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'"
+        }
+      }]
+    });
+
+    const resource = api.root.addResource('import');
+    resource.addMethod('GET', integration, {
       requestParameters: {
         'method.request.querystring.name': true
-      }
+      },
+      methodResponses: [{
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+        }
+      }]
     });
   }
 }
