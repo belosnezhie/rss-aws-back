@@ -21,7 +21,9 @@ const generatePolicy = (
 export const handler = async (event: any) => {
   console.log('Event:', JSON.stringify(event));
 
-  if (!event.headers?.Authorization) {
+  console.log(`authorizationToken: ${event.authorizationToken}`)
+
+  if (!event.authorizationToken) {
     return {
       statusCode: 401,
       body: 'Unauthorized: Missing Authorization header',
@@ -29,7 +31,7 @@ export const handler = async (event: any) => {
   }
 
   try {
-    const authorizationHeader = event.headers.Authorization;
+    const authorizationHeader = event.authorizationHeader;
 
     const base64Credentials = authorizationHeader.split(' ')[1];
     const decodedCredentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');

@@ -24,6 +24,17 @@ export class AuthorizationServiceStack extends cdk.Stack {
       action: 'lambda:InvokeFunction',
     });
 
+    // logs
+    new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'logs:CreateLogGroup',
+        'logs:CreateLogStream',
+        'logs:PutLogEvents'
+      ],
+      resources: ['*']
+    });
+
     new cdk.CfnOutput(this, 'BasicAuthorizerFunctionArn', {
       value: basicAuthorizerFunction.functionArn,
       exportName: 'BasicAuthorizerFunctionArn',
