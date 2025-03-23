@@ -6,6 +6,21 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 import 'dotenv/config';
 
+function getEnvVariablesMap(): { [key: string]: string} {
+  const envMap = new Map<string, string>();
+  for (const key in process.env) {
+      if (key !== undefined) {
+        envMap.set(key, process.env[key] || "");
+      }
+  }
+
+  let env : { [key: string]: string} = {};
+  for (const key in envMap) {
+    env[key] = envMap.get(key) || "";
+  }
+  return env;
+}
+
 export class AuthorizationServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -14,9 +29,7 @@ export class AuthorizationServiceStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, '../lambdaFunctions/basicAuthorizer.ts'),
-      environment: {
-        'credentials': process.env.CREDENTIALS || '',
-      }
+      environment: getEnvVariablesMap(),
     });
 
     basicAuthorizerFunction.addPermission('APIGatewayInvokePermission', {

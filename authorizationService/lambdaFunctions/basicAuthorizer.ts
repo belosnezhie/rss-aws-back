@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 const generatePolicy = (
   principalId: string,
   resource: string,
@@ -23,8 +25,6 @@ export const handler = async (event: any) => {
 
   console.log(`authorizationToken: ${event.authorizationToken}`)
 
-  return generatePolicy('testUser', event.methodArn);
-
   if (!event.authorizationToken) {
     return {
       statusCode: 401,
@@ -33,17 +33,20 @@ export const handler = async (event: any) => {
   }
 
   try {
-    const authorizationHeader = event.authorizationHeader;
+    const authorizationHeader = event.authorizationToken;
 
-    const base64Credentials = authorizationHeader.split(' ')[1];
-    const decodedCredentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const decodedCredentials = Buffer.from(authorizationHeader, 'base64').toString('utf-8');
 
-    const [username, password] = decodedCredentials.split('=');
+    const credentials = decodedCredentials.split('=');
+    const username = credentials[0];
+    const password = credentials[1];
 
     console.log('Username:', username);
     console.log('Password:', password);
 
     const storedPassword = process.env[username];
+
+    console.log(`Stored password: ${storedPassword}`)
 
     if (!storedPassword || storedPassword !== password) {
       console.log('Invalid credentials');
@@ -64,31 +67,4 @@ export const handler = async (event: any) => {
       body: 'Forbidden: Invalid token',
     };
   }
-};
-
-function generatePolicyOLD (principalId: string | null, effect: string, resource: string, statusCode?: number) {
-  const authResponse: any = {
-    principalId: principalId || 'user'
-  };
-
-  if (effect && resource) {
-    const policyDocument = {
-      Version: '2012-10-17',
-      Statement: [{
-        Action: 'execute-api:Invoke',
-        Effect: effect,
-        Resource: resource
-      }]
-    };
-    authResponse.policyDocument = policyDocument;
-  }
-
-  if (statusCode) {
-    authResponse.context = {
-      statusCode
-    };
-  }
-
-  console.log('Auth Response: ', JSON.stringify(authResponse));
-  return authResponse;
 };
