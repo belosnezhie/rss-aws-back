@@ -100,6 +100,43 @@ export class ImportServiceStack extends cdk.Stack {
       }
     });
 
+    // Responses
+    api.addGatewayResponse('DEFAULT_4XX', {
+      type: apigateway.ResponseType.DEFAULT_4XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
+        'Access-Control-Allow-Credentials': "'true'"
+      },
+      templates: {
+        'application/json': '{"message": "$context.authorizer.message"}',
+      },
+    });
+
+    api.addGatewayResponse('UnauthorizedResponse', {
+      type: apigateway.ResponseType.UNAUTHORIZED,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
+        'Access-Control-Allow-Credentials': "'true'"
+      },
+      templates: {
+        'application/json': '{"message": "Authorization header is not provided"}'
+      }
+    });
+
+    api.addGatewayResponse('DEFAULT_5XX', {
+      type: apigateway.ResponseType.DEFAULT_5XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+        'Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
+        'Access-Control-Allow-Credentials': "'true'"
+      },
+    });
+
     const integration = new apigateway.LambdaIntegration(ImportProductsFileFunction, {
       proxy: true,
       integrationResponses: [{
@@ -107,7 +144,8 @@ export class ImportServiceStack extends cdk.Stack {
         responseParameters: {
           'method.response.header.Access-Control-Allow-Origin': "'*'",
           'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
-          'method.response.header.Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'"
+          'method.response.header.Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
+          'method.response.header.Access-Control-Allow-Credentials': "'true'"
         }
       }]
     });
@@ -126,6 +164,7 @@ export class ImportServiceStack extends cdk.Stack {
           'method.response.header.Access-Control-Allow-Origin': true,
           'method.response.header.Access-Control-Allow-Headers': true,
           'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Credentials': true
         }
       }]
     });

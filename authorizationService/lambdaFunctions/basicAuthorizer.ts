@@ -3,7 +3,8 @@ import 'dotenv/config';
 const generatePolicy = (
   principalId: string,
   resource: string,
-  effect: 'Allow' | 'Deny' = 'Allow'
+  effect: 'Allow' | 'Deny' = 'Allow',
+  message: string,
 ) => {
   return {
     principalId,
@@ -17,6 +18,9 @@ const generatePolicy = (
         },
       ],
     },
+    context: {
+      message,
+    },
   };
 };
 
@@ -26,10 +30,8 @@ export const handler = async (event: any) => {
   console.log(`authorizationToken: ${event.authorizationToken}`)
 
   if (!event.authorizationToken) {
-    return {
-      statusCode: 401,
-      body: 'Unauthorized: Missing Authorization header',
-    };
+    console.log('Missing Authorization header');
+    return generatePolicy('', event.methodArn, 'Deny', 'Unauthorized: Missing Authorization header')
   }
 
   try {
@@ -41,6 +43,11 @@ export const handler = async (event: any) => {
     const username = credentials[0];
     const password = credentials[1];
 
+    if (!username || !password) {
+      console.log('Missing username or password');
+      return generatePolicy(username, event.methodArn, 'Deny', 'Invalid credentials');
+    }
+
     console.log('Username:', username);
     console.log('Password:', password);
 
@@ -50,21 +57,13 @@ export const handler = async (event: any) => {
 
     if (!storedPassword || storedPassword !== password) {
       console.log('Invalid credentials');
-      return {
-        statusCode: 403,
-        body: 'Forbidden: Invalid credentials',
-      };
+      return generatePolicy(username, event.methodArn, 'Deny', 'Invalid credentials');
     }
 
     console.log('Successfully authorized');
-
-    return generatePolicy(username, event.methodArn);
-
+    return generatePolicy(username, event.methodArn, 'Allow' ,'Successfully authorized');
   } catch (error) {
     console.error('Error:', error);
-    return {
-      statusCode: 403,
-      body: 'Forbidden: Invalid token',
-    };
+    return generatePolicy('', event.methodArn, 'Deny', 'Internal server error');
   }
 };
