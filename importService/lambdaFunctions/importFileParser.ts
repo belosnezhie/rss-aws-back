@@ -3,10 +3,12 @@ import { S3Client, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } fr
 import csvParser from "csv-parser";
 import { Readable } from 'stream';
 import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import 'dotenv/config';
 
 const s3Client = new S3Client({ region: 'eu-central-1' });
 const queueClient = new SQSClient({});
-const sqsUrl = 'https://sqs.eu-central-1.amazonaws.com/160885264704/catalogItemsQueue';
+// const sqsUrl = 'https://sqs.eu-central-1.amazonaws.com/160885264704/catalogItemsQueue';
+const sqsUrl = process.env.SQS_QUEUE_URL;
 
 export const handler = async (event: S3Event): Promise<boolean> => {
   await innerHandler(
