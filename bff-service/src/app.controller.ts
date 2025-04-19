@@ -2,6 +2,7 @@ import { Controller, Get, Header, Headers, Put, Body, Logger } from '@nestjs/com
 import { AppService } from './app.service';
 import axios, { AxiosHeaders } from 'axios';
 import { PutCartPayload, CreateOrderDto } from './model';
+import { GenericResponse } from './generic-response.decorator';
 
 @Controller()
 export class AppController {
@@ -15,8 +16,8 @@ export class AppController {
   }
 
   @Get('/product')
-  @Header('Access-Control-Allow-Origin', '*')
-  async getProduct(@Headers() headers): Promise<any> {
+  async getProduct(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
+    resp.setHeader('Access-Control-Allow-Origin', '*');
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -33,8 +34,8 @@ export class AppController {
   }
 
   @Get('/cart')
-  @Header('Access-Control-Allow-Origin', '*')
-  async getCart(@Headers() headers): Promise<any> {
+  async getCart(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
+    resp.setHeader('Access-Control-Allow-Origin', '*');
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -51,11 +52,12 @@ export class AppController {
   }
 
   @Put('/cart')
-  @Header('Access-Control-Allow-Origin', '*')
   async putInCart(
     @Headers() headers,
     @Body() body: PutCartPayload,
+    @GenericResponse() resp: GenericResponse
   ): Promise<any> {
+    resp.setHeader('Access-Control-Allow-Origin', '*');
     this.logger.log(headers);
     this.logger.log(body);
 
@@ -74,8 +76,8 @@ export class AppController {
   }
 
   @Get('/cart/order')
-  @Header('Access-Control-Allow-Origin', '*')
-  async getOrder(@Headers() headers): Promise<any> {
+  async getOrder(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
+    resp.setHeader('Access-Control-Allow-Origin', '*');
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -92,11 +94,12 @@ export class AppController {
   }
 
   @Put('/cart/order')
-  @Header('Access-Control-Allow-Origin', '*')
   async createOrder(
     @Headers() headers,
     @Body() body: CreateOrderDto,
+    @GenericResponse() resp: GenericResponse
   ): Promise<any> {
+    resp.setHeader('Access-Control-Allow-Origin', '*');
     this.logger.log(headers);
     this.logger.log(body);
 
