@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Put, Body, Logger } from '@nestjs/common';
+import { Controller, Get, Header, Headers, Put, Body, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
 import axios, { AxiosHeaders } from 'axios';
 import { PutCartPayload, CreateOrderDto } from './model';
@@ -15,6 +15,7 @@ export class AppController {
   }
 
   @Get('/product')
+  @Header('Access-Control-Allow-Origin', '*')
   async getProduct(@Headers() headers): Promise<any> {
     this.logger.log(headers);
 
@@ -32,6 +33,7 @@ export class AppController {
   }
 
   @Get('/cart')
+  @Header('Access-Control-Allow-Origin', '*')
   async getCart(@Headers() headers): Promise<any> {
     this.logger.log(headers);
 
@@ -49,6 +51,7 @@ export class AppController {
   }
 
   @Put('/cart')
+  @Header('Access-Control-Allow-Origin', '*')
   async putInCart(
     @Headers() headers,
     @Body() body: PutCartPayload,
@@ -71,6 +74,7 @@ export class AppController {
   }
 
   @Get('/cart/order')
+  @Header('Access-Control-Allow-Origin', '*')
   async getOrder(@Headers() headers): Promise<any> {
     this.logger.log(headers);
 
@@ -88,6 +92,7 @@ export class AppController {
   }
 
   @Put('/cart/order')
+  @Header('Access-Control-Allow-Origin', '*')
   async createOrder(
     @Headers() headers,
     @Body() body: CreateOrderDto,
