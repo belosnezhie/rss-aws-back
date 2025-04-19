@@ -8,9 +8,9 @@ async function bootstrap() {
   });
   await app.listen(process.env.PORT ?? 3000);
 
-  // app.enableCors({
-  //   origin: (req, callback) => callback(null, true),
-  // });
+  app.enableCors({
+    origin: (req, callback) => callback(null, true),
+  });
 
   // app.use(cors());
 }
