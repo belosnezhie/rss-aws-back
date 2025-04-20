@@ -21,6 +21,7 @@ export class AppController {
     resp.setHeader('Access-Control-Expose-Headers', '*');
     resp.setHeader('Access-Control-Allow-Credentials', 'true');
     resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -42,6 +43,7 @@ export class AppController {
     resp.setHeader('Access-Control-Expose-Headers', '*');
     resp.setHeader('Access-Control-Allow-Credentials', 'true');
     resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -67,6 +69,7 @@ export class AppController {
     resp.setHeader('Access-Control-Expose-Headers', '*');
     resp.setHeader('Access-Control-Allow-Credentials', 'true');
     resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     this.logger.log(headers);
     this.logger.log(body);
 
@@ -90,6 +93,7 @@ export class AppController {
     resp.setHeader('Access-Control-Expose-Headers', '*');
     resp.setHeader('Access-Control-Allow-Credentials', 'true');
     resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -115,6 +119,7 @@ export class AppController {
     resp.setHeader('Access-Control-Expose-Headers', '*');
     resp.setHeader('Access-Control-Allow-Credentials', 'true');
     resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     this.logger.log(headers);
     this.logger.log(body);
 
