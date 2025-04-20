@@ -34,6 +34,8 @@ export class AppController {
 
     const axiosHeaders = new AxiosHeaders(headers);
     axiosHeaders.delete('host');
+    axiosHeaders.delete('connection');
+    axiosHeaders.delete('content-length');
 
     const res = await axios.get(
       `${process.env.PRODUCT}/products`,
@@ -56,6 +58,8 @@ export class AppController {
 
     const axiosHeaders = new AxiosHeaders(headers);
     axiosHeaders.delete('host');
+    axiosHeaders.delete('connection');
+    axiosHeaders.delete('content-length');
 
     const res = await axios.get(
       `${process.env.CART}/profile/cart`,
@@ -106,6 +110,8 @@ export class AppController {
 
     const axiosHeaders = new AxiosHeaders(headers);
     axiosHeaders.delete('host');
+    axiosHeaders.delete('connection');
+    axiosHeaders.delete('content-length');
 
     const res = await axios.get(
       `${process.env.CART}/profile/cart/order`,
@@ -133,6 +139,8 @@ export class AppController {
 
     const axiosHeaders = new AxiosHeaders(headers);
     axiosHeaders.delete('host');
+    axiosHeaders.delete('connection');
+    axiosHeaders.delete('content-length');
 
     const res = await axios.put(
       `${process.env.CART}/profile/cart/order`,
