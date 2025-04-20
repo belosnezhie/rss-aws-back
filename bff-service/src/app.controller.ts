@@ -18,6 +18,7 @@ export class AppController {
   @Get('/product')
   async getProduct(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
     resp.setHeader('Access-Control-Allow-Origin', '*');
+    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -36,6 +37,7 @@ export class AppController {
   @Get('/cart')
   async getCart(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
     resp.setHeader('Access-Control-Allow-Origin', '*');
+    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -58,6 +60,7 @@ export class AppController {
     @GenericResponse() resp: GenericResponse
   ): Promise<any> {
     resp.setHeader('Access-Control-Allow-Origin', '*');
+    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     this.logger.log(headers);
     this.logger.log(body);
 
@@ -78,6 +81,7 @@ export class AppController {
   @Get('/cart/order')
   async getOrder(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
     resp.setHeader('Access-Control-Allow-Origin', '*');
+    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     this.logger.log(headers);
 
     const axiosHeaders = new AxiosHeaders(headers);
@@ -100,6 +104,7 @@ export class AppController {
     @GenericResponse() resp: GenericResponse
   ): Promise<any> {
     resp.setHeader('Access-Control-Allow-Origin', '*');
+    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     this.logger.log(headers);
     this.logger.log(body);
 

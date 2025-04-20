@@ -11,7 +11,5 @@ async function bootstrap() {
   app.enableCors({
     origin: (req, callback) => callback(null, true),
   });
-
-  // app.use(cors());
 }
 bootstrap();
