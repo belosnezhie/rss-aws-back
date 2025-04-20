@@ -1,4 +1,4 @@
-import { Controller, Get, Header, Headers, Put, Body, Logger } from '@nestjs/common';
+import { Controller, Get, Header, Headers, Put, Body, Logger, Options } from '@nestjs/common';
 import { AppService } from './app.service';
 import axios, { AxiosHeaders } from 'axios';
 import { PutCartPayload, CreateOrderDto } from './model';
@@ -13,6 +13,14 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Options("/product")
+  @Options("/cart")
+  options(@GenericResponse() resp: GenericResponse): any {
+    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    resp.setStatus(204);
+    return true;
   }
 
   @Get('/product')
