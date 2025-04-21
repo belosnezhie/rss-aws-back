@@ -15,141 +15,141 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Options("/product")
-  @Options("/cart")
-  options(@GenericResponse() resp: GenericResponse): any {
-    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    resp.setStatus(204);
-    return true;
-  }
+  // @Options("/product")
+  // @Options("/cart")
+  // options(@GenericResponse() resp: GenericResponse): any {
+  //   resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  //   resp.setStatus(204);
+  //   return true;
+  // }
 
-  @Get('/product')
-  async getProduct(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
-    resp.setHeader('Access-Control-Allow-Origin', '*');
-    resp.setHeader('Access-Control-Expose-Headers', '*');
-    resp.setHeader('Access-Control-Allow-Credentials', 'true');
-    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    this.logger.log(headers);
+  // @Get('/product')
+  // async getProduct(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
+  //   resp.setHeader('Access-Control-Allow-Origin', '*');
+  //   resp.setHeader('Access-Control-Expose-Headers', '*');
+  //   resp.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  //   resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  //   this.logger.log(headers);
 
-    const axiosHeaders = new AxiosHeaders(headers);
-    axiosHeaders.delete('host');
-    axiosHeaders.delete('connection');
-    axiosHeaders.delete('content-length');
+  //   const axiosHeaders = new AxiosHeaders(headers);
+  //   axiosHeaders.delete('host');
+  //   axiosHeaders.delete('connection');
+  //   axiosHeaders.delete('content-length');
 
-    const res = await axios.get(
-      `${process.env.PRODUCT}/products`,
-      {
-        headers: axiosHeaders,
-      }
-    );
-    this.logger.log(res.data);
-    return res.data;
-  }
+  //   const res = await axios.get(
+  //     `${process.env.PRODUCT}/products`,
+  //     {
+  //       headers: axiosHeaders,
+  //     }
+  //   );
+  //   this.logger.log(res.data);
+  //   return res.data;
+  // }
 
-  @Get('/cart')
-  async getCart(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
-    resp.setHeader('Access-Control-Allow-Origin', '*');
-    resp.setHeader('Access-Control-Expose-Headers', '*');
-    resp.setHeader('Access-Control-Allow-Credentials', 'true');
-    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    this.logger.log(headers);
+  // @Get('/cart')
+  // async getCart(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
+  //   resp.setHeader('Access-Control-Allow-Origin', '*');
+  //   resp.setHeader('Access-Control-Expose-Headers', '*');
+  //   resp.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  //   resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  //   this.logger.log(headers);
 
-    const axiosHeaders = new AxiosHeaders(headers);
-    axiosHeaders.delete('host');
-    axiosHeaders.delete('connection');
-    axiosHeaders.delete('content-length');
+  //   const axiosHeaders = new AxiosHeaders(headers);
+  //   axiosHeaders.delete('host');
+  //   axiosHeaders.delete('connection');
+  //   axiosHeaders.delete('content-length');
 
-    const res = await axios.get(
-      `${process.env.CART}/profile/cart`,
-      {
-        headers: axiosHeaders,
-      }
-    );
-    this.logger.log(res.data);
-    return res.data;
-  }
+  //   const res = await axios.get(
+  //     `${process.env.CART}/profile/cart`,
+  //     {
+  //       headers: axiosHeaders,
+  //     }
+  //   );
+  //   this.logger.log(res.data);
+  //   return res.data;
+  // }
 
-  @Put('/cart')
-  async putInCart(
-    @Headers() headers,
-    @Body() body: PutCartPayload,
-    @GenericResponse() resp: GenericResponse
-  ): Promise<any> {
-    resp.setHeader('Access-Control-Allow-Origin', '*');
-    resp.setHeader('Access-Control-Expose-Headers', '*');
-    resp.setHeader('Access-Control-Allow-Credentials', 'true');
-    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    this.logger.log(headers);
-    this.logger.log(body);
+  // @Put('/cart')
+  // async putInCart(
+  //   @Headers() headers,
+  //   @Body() body: PutCartPayload,
+  //   @GenericResponse() resp: GenericResponse
+  // ): Promise<any> {
+  //   resp.setHeader('Access-Control-Allow-Origin', '*');
+  //   resp.setHeader('Access-Control-Expose-Headers', '*');
+  //   resp.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  //   resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  //   this.logger.log(headers);
+  //   this.logger.log(body);
 
-    const axiosHeaders = new AxiosHeaders(headers);
-    axiosHeaders.delete('host');
+  //   const axiosHeaders = new AxiosHeaders(headers);
+  //   axiosHeaders.delete('host');
 
-    const res = await axios.put(
-      `${process.env.CART}/profile/cart`,
-      body,
-      {
-        headers: axiosHeaders,
-      }
-    );
-    this.logger.log(res.data);
-    return res.data;
-  }
+  //   const res = await axios.put(
+  //     `${process.env.CART}/profile/cart`,
+  //     body,
+  //     {
+  //       headers: axiosHeaders,
+  //     }
+  //   );
+  //   this.logger.log(res.data);
+  //   return res.data;
+  // }
 
-  @Get('/cart/order')
-  async getOrder(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
-    resp.setHeader('Access-Control-Allow-Origin', '*');
-    resp.setHeader('Access-Control-Expose-Headers', '*');
-    resp.setHeader('Access-Control-Allow-Credentials', 'true');
-    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    this.logger.log(headers);
+  // @Get('/cart/order')
+  // async getOrder(@Headers() headers, @GenericResponse() resp: GenericResponse): Promise<any> {
+  //   resp.setHeader('Access-Control-Allow-Origin', '*');
+  //   resp.setHeader('Access-Control-Expose-Headers', '*');
+  //   resp.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  //   resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  //   this.logger.log(headers);
 
-    const axiosHeaders = new AxiosHeaders(headers);
-    axiosHeaders.delete('host');
-    axiosHeaders.delete('connection');
-    axiosHeaders.delete('content-length');
+  //   const axiosHeaders = new AxiosHeaders(headers);
+  //   axiosHeaders.delete('host');
+  //   axiosHeaders.delete('connection');
+  //   axiosHeaders.delete('content-length');
 
-    const res = await axios.get(
-      `${process.env.CART}/profile/cart/order`,
-      {
-        headers: axiosHeaders,
-      }
-    );
-    this.logger.log(res.data);
-    return res.data;
-  }
+  //   const res = await axios.get(
+  //     `${process.env.CART}/profile/cart/order`,
+  //     {
+  //       headers: axiosHeaders,
+  //     }
+  //   );
+  //   this.logger.log(res.data);
+  //   return res.data;
+  // }
 
-  @Put('/cart/order')
-  async createOrder(
-    @Headers() headers,
-    @Body() body: CreateOrderDto,
-    @GenericResponse() resp: GenericResponse
-  ): Promise<any> {
-    resp.setHeader('Access-Control-Allow-Origin', '*');
-    resp.setHeader('Access-Control-Expose-Headers', '*');
-    resp.setHeader('Access-Control-Allow-Credentials', 'true');
-    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    this.logger.log(headers);
-    this.logger.log(body);
+  // @Put('/cart/order')
+  // async createOrder(
+  //   @Headers() headers,
+  //   @Body() body: CreateOrderDto,
+  //   @GenericResponse() resp: GenericResponse
+  // ): Promise<any> {
+  //   resp.setHeader('Access-Control-Allow-Origin', '*');
+  //   resp.setHeader('Access-Control-Expose-Headers', '*');
+  //   resp.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  //   resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  //   this.logger.log(headers);
+  //   this.logger.log(body);
 
-    const axiosHeaders = new AxiosHeaders(headers);
-    axiosHeaders.delete('host');
-    axiosHeaders.delete('connection');
-    axiosHeaders.delete('content-length');
+  //   const axiosHeaders = new AxiosHeaders(headers);
+  //   axiosHeaders.delete('host');
+  //   axiosHeaders.delete('connection');
+  //   axiosHeaders.delete('content-length');
 
-    const res = await axios.put(
-      `${process.env.CART}/profile/cart/order`,
-      body,
-      {
-        headers: axiosHeaders,
-      }
-    );
-    this.logger.log(res.data);
-    return res.data;
-  }
+  //   const res = await axios.put(
+  //     `${process.env.CART}/profile/cart/order`,
+  //     body,
+  //     {
+  //       headers: axiosHeaders,
+  //     }
+  //   );
+  //   this.logger.log(res.data);
+  //   return res.data;
+  // }
 }
