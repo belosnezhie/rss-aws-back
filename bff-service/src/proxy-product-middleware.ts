@@ -8,7 +8,7 @@ export class ProxyProductMiddleware implements NestMiddleware {
   private proxy = createProxyMiddleware({
     target: process.env.PRODUCT,
     pathRewrite: {
-      '^/product': '/',
+      '^/product': '',
     },
     secure: false,
     // onProxyReq: (proxyReq, req, res) => {
