@@ -7,40 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new ConsoleLogger(),
   });
+  app.use((req, _, next) => {
+    console.log(`Got invoked: '${req.originalUrl}'`);
+    next();
+  });
   await app.listen(process.env.PORT ?? 3000);
-
-  app.use(
-    `/product/*`,
-    createProxyMiddleware({
-      target: process.env.PRODUCT,
-      pathRewrite: {
-        '/product': '/',
-      },
-      secure: false,
-      // onProxyReq: (proxyReq, req, res) => {
-      //   console.log(proxyReq);
-      //   console.log(
-      //     `[NestMiddleware]: Proxying ${req.method} request originally made to '${req.originalUrl}'...`,
-      //   );
-      // },
-    })
-  )
-
-  app.use(
-    `/cart/*`,
-    createProxyMiddleware({
-      target: process.env.CART,
-      pathRewrite: {
-        '/cart': '/',
-      },
-      secure: false,
-      // onProxyReq: (proxyReq, req, res) => {
-      //   console.log(proxyReq);
-      //   console.log(
-      //     `[NestMiddleware]: Proxying ${req.method} request originally made to '${req.originalUrl}'...`,
-      //   );
-      // },
-    }),
-  );
 }
 bootstrap();
