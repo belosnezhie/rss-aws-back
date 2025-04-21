@@ -8,7 +8,7 @@ async function bootstrap() {
     logger: new ConsoleLogger(),
   });
   app.use((req, _, next) => {
-    console.log(`Got invoked: '${req.originalUrl}'`);
+    // console.log(`Got invoked: '${req.originalUrl}'`);
     next();
   });
   await app.listen(process.env.PORT ?? 3000);
