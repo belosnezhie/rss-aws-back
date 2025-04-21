@@ -7,7 +7,6 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { ReverseProxyProductMiddleware } from './reverse-proxy-product-middleware';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -16,10 +15,4 @@ import { ReverseProxyProductMiddleware } from './reverse-proxy-product-middlewar
   controllers: [],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(ReverseProxyProductMiddleware)
-      .forRoutes('*');
-  }
-} {}
+export class AppModule {}

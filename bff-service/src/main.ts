@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConsoleLogger } from '@nestjs/common';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -8,8 +9,38 @@ async function bootstrap() {
   });
   await app.listen(process.env.PORT ?? 3000);
 
-  app.enableCors({
-    origin: (req, callback) => callback(null, true),
-  });
+  app.use(
+    `/product/*`,
+    createProxyMiddleware({
+      target: process.env.PRODUCT,
+      pathRewrite: {
+        '/product': '/',
+      },
+      secure: false,
+      // onProxyReq: (proxyReq, req, res) => {
+      //   console.log(proxyReq);
+      //   console.log(
+      //     `[NestMiddleware]: Proxying ${req.method} request originally made to '${req.originalUrl}'...`,
+      //   );
+      // },
+    })
+  )
+
+  app.use(
+    `/cart/*`,
+    createProxyMiddleware({
+      target: process.env.CART,
+      pathRewrite: {
+        '/cart': '/',
+      },
+      secure: false,
+      // onProxyReq: (proxyReq, req, res) => {
+      //   console.log(proxyReq);
+      //   console.log(
+      //     `[NestMiddleware]: Proxying ${req.method} request originally made to '${req.originalUrl}'...`,
+      //   );
+      // },
+    }),
+  );
 }
 bootstrap();
