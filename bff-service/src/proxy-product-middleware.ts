@@ -12,6 +12,7 @@ export class ProxyProductMiddleware implements NestMiddleware {
     },
     changeOrigin: true,
     secure: false,
+    followRedirects: true,
   });
   use(req: Request, res: Response, next: () => void) {
     console.log(res);
