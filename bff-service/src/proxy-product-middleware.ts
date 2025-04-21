@@ -8,16 +8,10 @@ export class ProxyProductMiddleware implements NestMiddleware {
   private proxy = createProxyMiddleware({
     target: process.env.PRODUCT,
     pathRewrite: {
-      '/product': '',
+      '/product': '/',
     },
     changeOrigin: true,
     secure: false,
-    // onProxyReq: (proxyReq, req, res) => {
-    //   //console.log(proxyReq);
-    //   // console.log(
-    //   //   `[NestMiddleware]: Proxying ${req.method} request originally made to '${req.originalUrl}'...`,
-    //   // );
-    // },
   });
   use(req: Request, res: Response, next: () => void) {
     console.log(res);
