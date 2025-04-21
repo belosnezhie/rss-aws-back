@@ -6,8 +6,9 @@ export class ProxyCartMiddleware implements NestMiddleware {
   private proxy = createProxyMiddleware({
     target: process.env.PRODUCT,
     pathRewrite: {
-      '^/cart': '/',
+      '/cart': '/',
     },
+    changeOrigin: true,
     secure: false,
     // onProxyReq: (proxyReq, req, res) => {
     //   //console.log(proxyReq);
