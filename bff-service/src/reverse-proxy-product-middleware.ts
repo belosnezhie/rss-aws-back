@@ -4,7 +4,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 export class ReverseProxyProductMiddleware implements NestMiddleware {
   private proxy = createProxyMiddleware({
-    target: 'http://localhost:3004/api/v1/',
+    target: `${process.env.PRODUCT}/products`,
     // pathRewrite: {
     //   '/api/v1/cart-service': '/',
     // },
