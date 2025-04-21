@@ -4,7 +4,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 export class ProxyCartMiddleware implements NestMiddleware {
   private proxy = createProxyMiddleware({
-    target: process.env.PRODUCT,
+    target: process.env.CART,
     pathRewrite: {
       '/cart': '/',
     },
