@@ -21,20 +21,7 @@ export class ProxyProductMiddleware implements NestMiddleware {
     },
     on: {
       proxyReq: (proxyReq, req, res) => {
-
-        // Ensure HTTPS protocol in forwarded headers
         proxyReq.setHeader('X-Forwarded-Proto', 'https');
-
-        // Log the outgoing request headers for debugging
-        // this.logger.log('Proxy Request Headers:', proxyReq.getHeaders());
-
-        // // Preserve original headers
-        // if (req.headers.host) {
-        //   proxyReq.setHeader('Host', req.headers.host);
-        // }
-        // if (req.headers['x-forwarded-for']) {
-        //   proxyReq.setHeader('X-Forwarded-For', req.headers['x-forwarded-for']);
-        // }
       },
       proxyRes: (proxyRes, req, res) => {
         this.logger.log('Proxy Response Status:', proxyRes.statusCode);
