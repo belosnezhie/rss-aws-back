@@ -26,7 +26,7 @@ export class ProxyProductMiddleware implements NestMiddleware {
         proxyReq.setHeader('X-Forwarded-Proto', 'https');
 
         // Log the outgoing request headers for debugging
-        this.logger.log('Proxy Request Headers:', proxyReq.getHeaders());
+        // this.logger.log('Proxy Request Headers:', proxyReq.getHeaders());
 
         // // Preserve original headers
         // if (req.headers.host) {
