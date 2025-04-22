@@ -5,6 +5,12 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 export class ProxyCartMiddleware implements NestMiddleware {
   private readonly logger = new Logger(ProxyCartMiddleware.name);
 
+  private simpleRequestLogger = (proxyServer, options) => {
+    proxyServer.on('proxyReq', (proxyReq, req, res) => {
+      console.log(`[HPM] [${req.method}] ${req.url}`); // outputs: [HPM] GET /users
+    });
+  };
+
   private proxy = createProxyMiddleware({
     target: process.env.CART,
     pathRewrite: {
@@ -12,6 +18,7 @@ export class ProxyCartMiddleware implements NestMiddleware {
     },
     changeOrigin: true,
     secure: false,
+    plugins: [this.simpleRequestLogger]
   });
   use(req: Request, res: Response, next: () => void) {
     console.log(res);
