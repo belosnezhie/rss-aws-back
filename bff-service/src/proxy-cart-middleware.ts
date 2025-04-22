@@ -1,6 +1,6 @@
 import { NestMiddleware, HttpStatus, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 
 export class ProxyCartMiddleware implements NestMiddleware {
   private readonly logger = new Logger(ProxyCartMiddleware.name);
@@ -30,6 +30,9 @@ export class ProxyCartMiddleware implements NestMiddleware {
       'Access-Control-Allow-Headers': '*',
       'X-Forwarded-Proto': 'https'
     },
+    on: {
+      proxyReq: fixRequestBody,
+    }
   });
   use(req: Request, res: Response, next: () => void) {
     delete req.headers['host'];
