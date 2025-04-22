@@ -7,6 +7,8 @@ export class ProxyCartMiddleware implements NestMiddleware {
 
   private simpleRequestLogger = (proxyServer, options) => {
     proxyServer.on('proxyReq', (proxyReq, req, res) => {
+      this.logger.log(`Request:`);
+      this.logger.log(req);
       this.logger.log(`Request headers:`);
       this.logger.log(req.headers);
       this.logger.log(`[HPM] [${req.method}] ${req.baseUrl} + ${req.url}`); // outputs: [HPM] GET /users
@@ -21,7 +23,13 @@ export class ProxyCartMiddleware implements NestMiddleware {
     changeOrigin: true,
     secure: false,
     followRedirects: true,
-    plugins: [this.simpleRequestLogger]
+    plugins: [this.simpleRequestLogger],
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': '*',
+      'X-Forwarded-Proto': 'https'
+    },
   });
   use(req: Request, res: Response, next: () => void) {
     delete req.headers['host'];
