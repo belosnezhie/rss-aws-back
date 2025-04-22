@@ -31,6 +31,10 @@ export class ProxyCartMiddleware implements NestMiddleware {
       method: req.method,
       headers: req.headers
     });
+    delete req.headers['host'];
+    delete req.headers['connection'];
+    delete req.headers['content-length'];
+    this.logger.log(`Request headers: ${req.headers}`);
     this.proxy(req, res, next);
   }
 }
