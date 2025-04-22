@@ -17,6 +17,32 @@ export class ProxyProductMiddleware implements NestMiddleware {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
       'Access-Control-Allow-Headers': '*',
+      'X-Forwarded-Proto': 'https'
+    },
+    on: {
+      proxyReq: (proxyReq, req, res) => {
+
+        // Ensure HTTPS protocol in forwarded headers
+        proxyReq.setHeader('X-Forwarded-Proto', 'https');
+
+        // Log the outgoing request headers for debugging
+        this.logger.log('Proxy Request Headers:', proxyReq.getHeaders());
+
+        // // Preserve original headers
+        // if (req.headers.host) {
+        //   proxyReq.setHeader('Host', req.headers.host);
+        // }
+        // if (req.headers['x-forwarded-for']) {
+        //   proxyReq.setHeader('X-Forwarded-For', req.headers['x-forwarded-for']);
+        // }
+      },
+      proxyRes: (proxyRes, req, res) => {
+        this.logger.log('Proxy Response Status:', proxyRes.statusCode);
+        this.logger.log('Proxy Response Headers:', proxyRes.headers);
+      },
+      error: (err, req, res) => {
+        this.logger.error('Proxy Error:', err);
+      },
     },
   });
   use(req: Request, res: Response, next: () => void) {
@@ -24,6 +50,12 @@ export class ProxyProductMiddleware implements NestMiddleware {
     this.logger.log(`Got invoked: '${req.originalUrl}'`);
     this.logger.log(`Incoming request URL: ${req.url}`);
     this.logger.log(`Target URL: ${process.env.PRODUCT}`);
+    this.logger.log({
+      originalUrl: req.originalUrl,
+      path: req.path,
+      method: req.method,
+      headers: req.headers
+    });
     this.proxy(req, res, next);
   }
 }
